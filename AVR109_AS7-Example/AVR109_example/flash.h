@@ -56,7 +56,7 @@
 #    define _GET_EXTENDED_FUSES() boot_lock_fuse_bits_get(GET_EXTENDED_FUSE_BITS)
 #  endif /* defined(GET_LOCK_BITS) */
 #  define _SET_LOCK_BITS(data) boot_lock_bits_set(~data)
-#  define _ENABLE_RWW_SECTION() boot_rww_enable()
+// !!! #  define _ENABLE_RWW_SECTION() boot_rww_enable()
 
 #  define _WAIT_FOR_SPM() boot_spm_busy_wait()
 

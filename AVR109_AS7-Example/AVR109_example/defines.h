@@ -26,18 +26,20 @@
 #if	__GNUC__				
 #include	<avr/io.h>				
 #endif					
-					
+
 /* define pin for enter-self-prog-mode */					
+/* !!!
 #define	PROGPORT PORTB			
 #define	PROGPIN	PINB			
 #define	PROG_NO	PINB7			
-					
+*/			
 /* baud rate register value calculation */					
 #define	CPU_FREQ	16000000			
 #define	BAUD_RATE	115200		
 #define	BRREG_VALUE	8			
 					
-/* definitions for UART control */					
+/* definitions for UART control */
+/* !!!
 #define	BAUD_RATE_LOW_REG	UBRR0L			
 #define	UART_CONTROL_REG	UCSR0B
 #define	ENABLE_TRANSMITTER_BIT	TXEN0			
@@ -46,7 +48,8 @@
 #define	TRANSMIT_COMPLETE_BIT	TXC0			
 #define	RECEIVE_COMPLETE_BIT	RXC0			
 #define	UART_DATA_REG	UDR0			
-					
+*/
+			
 /* definitions for SPM control */					
 #define	SPMCR_REG	SPMCSR			
 #define	PAGESIZE	128			

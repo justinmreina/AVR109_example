@@ -40,6 +40,7 @@
 
 //Library Includes
 #include <stdlib.h>
+#include <stdbool.h>
 
 //Project Includes
 #include "defines.h"
@@ -89,14 +90,15 @@ int main(void) {
     volatile unsigned int temp_int;
     unsigned char val;
 
-	DDRD = (1<<PIND1);
+// ???	DDRD = (1<<PIND1);
+
     /* Initialization */    
     void (*funcptr)(void) = 0x0000;											// Set up function pointer to RESET vector.
     
     initbootuart();															// Initialize UART.
 
     /* Branch to bootloader or application code? */
-    if( !(PROGPIN & (1<<PROG_NO)) ) {										// If PROGPIN is pulled low, enter programmingmode.
+    if(true /* !!! !(PROGPIN & (1<<PROG_NO)) */) {										// If PROGPIN is pulled low, enter programmingmode.
         /* Main loop */
 		//txtstr((uint8_t*)"Bootloader\n");
         for(;;) {
@@ -154,7 +156,7 @@ int main(void) {
             {        
                 // Send high byte, then low byte of flash word.
                 _WAIT_FOR_SPM();        
-                _ENABLE_RWW_SECTION();
+//???           _ENABLE_RWW_SECTION();
                 sendchar(_LOAD_PROGRAM_MEMORY((address << 1)+1));
                 sendchar(_LOAD_PROGRAM_MEMORY((address << 1)+0));
                 address++; // Auto-advance to next Flash word.
@@ -267,7 +269,7 @@ int main(void) {
             // Exit bootloader.
             else if(val=='E') {
                 _WAIT_FOR_SPM();        
-                _ENABLE_RWW_SECTION();
+//???           _ENABLE_RWW_SECTION();
                 sendchar('\r');
                 funcptr();													// Jump to Reset vector 0x0000 in Application Section.
             }
@@ -327,7 +329,7 @@ int main(void) {
     }
     else {
         _WAIT_FOR_SPM();        
-        _ENABLE_RWW_SECTION();
+//???   _ENABLE_RWW_SECTION();
         funcptr();															// Jump to Reset vector 0x0000 in Application Section.
     }
 
@@ -387,7 +389,7 @@ unsigned char BlockLoad(unsigned int size, unsigned char mem, ADDR_T *address) {
 
 	_PAGE_WRITE(tempaddress);
 	_WAIT_FOR_SPM();
-	_ENABLE_RWW_SECTION();
+//??_ENABLE_RWW_SECTION();
 
         (*address) >>= 1;													// Convert address back to Flash words again.
         return '\r';														// Report programming OK

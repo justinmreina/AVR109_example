@@ -13,6 +13,11 @@
  * 			Do not distribute. Do not copy.
  */
 /************************************************************************************************************************************/
+
+//Library Includes
+#include <stdlib.h>
+
+//Project Includes
 #include "defines.h"
 
 
@@ -24,8 +29,8 @@
 /************************************************************************************************************************************/
 void initbootuart(void) {
 
-	BAUD_RATE_LOW_REG = BRREG_VALUE;
-	UART_CONTROL_REG = (1 << ENABLE_RECEIVER_BIT) | (1 << ENABLE_TRANSMITTER_BIT); // enable receive and transmit 	
+//???	BAUD_RATE_LOW_REG = BRREG_VALUE;
+//???	UART_CONTROL_REG = (1 << ENABLE_RECEIVER_BIT) | (1 << ENABLE_TRANSMITTER_BIT); // enable receive and transmit 	
 
 	return;
 }
@@ -39,9 +44,9 @@ void initbootuart(void) {
 /************************************************************************************************************************************/
 void sendchar(unsigned char c) {
 
-  UART_DATA_REG = c;														/* prepare transmission									*/
-  while (!(UART_STATUS_REG & (1 << TRANSMIT_COMPLETE_BIT)));				/* wait until byte sent									*/
-  UART_STATUS_REG |= (1 << TRANSMIT_COMPLETE_BIT);							/* delete TXCflag										*/
+//???  UART_DATA_REG = c;														/* prepare transmission									*/
+//???  while (!(UART_STATUS_REG & (1 << TRANSMIT_COMPLETE_BIT)));				/* wait until byte sent									*/
+//???  UART_STATUS_REG |= (1 << TRANSMIT_COMPLETE_BIT);							/* delete TXCflag										*/
 
   return;
 }
@@ -56,9 +61,9 @@ void sendchar(unsigned char c) {
 unsigned char recchar(void) {
 
 	//Wait for data
-	while(!(UART_STATUS_REG & (1 << RECEIVE_COMPLETE_BIT))) {
-	};
+//???	while(!(UART_STATUS_REG & (1 << RECEIVE_COMPLETE_BIT))) {
+//???	};
   
-	return UART_DATA_REG;
+	return EXIT_FAILURE;	//??? UART_DATA_REG;
 }
 
