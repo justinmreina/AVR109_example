@@ -1,30 +1,23 @@
-/*****************************************************************************
+/*************************************************************************************************************************************
 * UPDATE!
 * Microchip Corporation
 *
 *
-* Description   : This is an updated version of the AVR109 example code
-*				  to work in Atmel Studio 7. The project has been 
-*				  generated with little change to original code.
-*	              Defines are still generated with the preprocessor.xls file
-*				  but users must add the relevant device manually.
-*				  For this example the ATmega328PB is added, and example 
-*				  project is based on the ATmega328PB Xplained Mini.
-*				  Register and bit names have been edited to reflect device.
+* Description   : This is an updated version of the AVR109 example code  to work in Atmel Studio 7. The project has been generated 
+*				  with little change to original code. Defines are still generated with the preprocessor.xls file but users must 
+*				  add the relevant device manually. For this example the ATmega328PB is added, and example project is based on the 
+*			      ATmega328PB Xplained Mini. Register and bit names have been edited to reflect device.
 *				
-*				  In Toolchain -> AVR/GNU Linker -> Memory Settings -> Flash segment
-*				  Add: .text=0x3800
-*				  This allocates bootloader section in end of program memory.
+*				  In Toolchain -> AVR/GNU Linker -> Memory Settings -> Flash segment,  Add: .text=0x3800. This allocates bootloader 
+*				  section in end of program memory.
 *
-*				  After uploading program via bootloader, cycle power on device
-*				  to ensure correct function of program.
+*				  After uploading program via bootloader, cycle power on device to ensure correct function of program.
 *
-* Preparations  : Read the explanation below and the application note AVR109
-*				  If your device is not in the preprocessor.xls list, then
+* Preparations  : Read the explanation below and the application note AVR109 If your device is not in the preprocessor.xls list, then
 *				  add device and details as shown in list.
 *
-****************************************************************************/
-/*****************************************************************************
+*************************************************************************************************************************************/
+/*************************************************************************************************************************************
 *
 * Atmel Corporation
 *
@@ -40,16 +33,13 @@
 *
 * AppNote           : AVR109 - Self-programming
 *
-* Description   : This Program allows an AVR with bootloader capabilities to 
-*                 Read/write its own Flash/EEprom. To enter Programming mode   
-*                 an input pin is checked. If this pin is pulled low, programming mode  
-*                 is entered. If not, normal execution is done from $0000 
-*                 "reset" vector in Application area.
+* Description   : This Program allows an AVR with bootloader capabilities to Read/write its own Flash/EEprom. To enter Programming 
+*				  mode an input pin is checked. If this pin is pulled low, programming mode  is entered. If not, normal execution is 
+*			      done from $0000 "reset" vector in Application area.
 *
-* Preparations  : Use the preprocessor.xls file for obtaining a customized
-*                 defines.h file and linker-file code-segment definition for
-*                 the device you are compiling for.
-****************************************************************************/
+* Preparations  : Use the preprocessor.xls file for obtaining a customized defines.h file and linker-file code-segment definition 
+*				  for the device you are compiling for.
+*************************************************************************************************************************************/
 #include "defines.h"
 #include "serial.h"
 #include "flash.h"
@@ -64,12 +54,9 @@
 //#define REMOVE_FLASH_BYTE_SUPPORT
 
 /*
- * GCC doesn't optimize long int arithmetics very clever.  As the
- * address only needs to be larger than 16 bits for the ATmega128 and
- * above (where flash consumptions isn't much of an issue as the
- * entire boot loader will still fit even into the smallest possible
- * boot loader section), save space by using a 16-bit variable for the
- * smaller devices.
+ * GCC doesn't optimize long int arithmetics very clever.  As the address only needs to be larger than 16 bits for the ATmega128 and 
+ * above (where flash consumptions isn't much of an issue as the entire boot loader will still fit even into the smallest possible 
+ * boot loader section), save space by using a 16-bit variable for the smaller devices.
  */
 #ifdef LARGE_MEMORY
 #  define ADDR_T unsigned long
@@ -102,8 +89,7 @@ void main(void)
     /* Initialization */    
     void (*funcptr)( void ) = 0x0000; // Set up function pointer to RESET vector.
     
-	/* The ATmega28PB Xplained Mini has external pull-up, no use of internal pull-up.
-	 * Using SW0 on the Xplained Mini as PROGPIN. */
+	/* The ATmega28PB Xplained Mini has external pull-up, no use of internal pull-up. Using SW0 on the Xplained Mini as PROGPIN. */
 	//PROGPORT |= (1<<PROG_NO); // Uncomment to enable pull-up on PROG_NO line on PROGPORT.
 	
     initbootuart(); // Initialize UART.
@@ -523,5 +509,3 @@ void BlockRead(unsigned int size, unsigned char mem, ADDR_T *address)
 }
 #endif /* REMOVE_BLOCK_SUPPORT */
 
-
-/* end of file */
