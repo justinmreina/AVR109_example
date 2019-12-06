@@ -1,50 +1,50 @@
-/*************************************************************************************************************************************
-* UPDATE!
-* Microchip Corporation
-*
-*
-* Description   : This is an updated version of the AVR109 example code  to work in Atmel Studio 7. The project has been generated 
-*				  with little change to original code. Defines are still generated with the preprocessor.xls file but users must 
-*				  add the relevant device manually. For this example the ATmega328PB is added, and example project is based on the 
-*			      ATmega328PB Xplained Mini. Register and bit names have been edited to reflect device.
-*				
-*				  In Toolchain -> AVR/GNU Linker -> Memory Settings -> Flash segment,  Add: .text=0x3800. This allocates bootloader 
-*				  section in end of program memory.
-*
-*				  After uploading program via bootloader, cycle power on device to ensure correct function of program.
-*
-* Preparations  : Read the explanation below and the application note AVR109 If your device is not in the preprocessor.xls list, then
-*				  add device and details as shown in list.
-*
-*************************************************************************************************************************************/
-/*************************************************************************************************************************************
-*
-* Atmel Corporation
-*
-* File              : main.c
-* Compiler          : IAR C 3.10C Kickstart, AVR-GCC/avr-libc(>= 1.2.5)
-* Revision          : $Revision: 1.7 $
-* Date              : $Date: Tuesday, June 07, 200 $
-* Updated by        : $Author: raapeland $
-*
-* Support mail      : avr@atmel.com
-*
-* Target platform   : All AVRs with bootloader support
-*
-* AppNote           : AVR109 - Self-programming
-*
-* Description   : This Program allows an AVR with bootloader capabilities to Read/write its own Flash/EEprom. To enter Programming 
-*				  mode an input pin is checked. If this pin is pulled low, programming mode  is entered. If not, normal execution is 
-*			      done from $0000 "reset" vector in Application area.
-*
-* Preparations  : Use the preprocessor.xls file for obtaining a customized defines.h file and linker-file code-segment definition 
-*				  for the device you are compiling for.
-*************************************************************************************************************************************/
+/************************************************************************************************************************************/
+/** @file		main.c
+ * 	@brief		AVR109 - Self-programming
+ * 	@details	x
+ *
+ * 	@author		raapeland (avr@atmel.com), Atmel Corporation
+ * 	@last rev	Tuesday, June 07, 200$ (r1.7)
+ *
+ *	@targ		All AVRs with bootloader support
+ * 	@compiler	IAR C 3.10C Kickstart, AVR-GCC/avr-libc(>= 1.2.5)
+ *
+ *	@section	Summary
+ *		This Program allows an AVR with bootloader capabilities to Read/write its own Flash/EEprom. To enter Programming mode an 
+ *		input pin is checked. If this pin is pulled low, programming mode  is entered. If not, normal execution is done from $0000 
+ *		"reset" vector in Application area.
+ *
+ * 	@section	Preparations
+ *		Use the preprocessor.xls file for obtaining a customized defines.h file and linker-file code-segment definition for the 
+ *		device you are compiling for.
+ *
+ *		Read the explanation below and the application note AVR109 If your device is not in the preprocessor.xls list, then add device 
+ *		and details as shown in list.
+ *
+ * 	@section	Notice
+ *		This is an updated version of the AVR109 example code  to work in Atmel Studio 7. The project has been generated with little 
+ *		change to original code. Defines are still generated with the preprocessor.xls file but users must add the relevant device 
+ *		manually. For this example the ATmega328PB is added, and example project is based on the ATmega328PB Xplained Mini. Register 
+ *		and bit names have been edited to reflect device.
+ *
+ *		In Toolchain -> AVR/GNU Linker -> Memory Settings -> Flash segment,  Add: .text=0x3800. This allocates bootloader section 
+ *		in end of program memory.
+ *
+ *		After uploading program via bootloader, cycle power on device to ensure correct function of program.
+ *
+ *	@section	Opens
+ *		stdint.h
+ *		
+ */
+/************************************************************************************************************************************/
+
+//Library Includes
+#include <stdlib.h>
+
+//Project Includes
 #include "defines.h"
 #include "serial.h"
 #include "flash.h"
-
-
 
 /* Uncomment the following to save code space */
 //#define REMOVE_AVRPROG_SUPPORT
@@ -73,94 +73,78 @@ void BlockRead(unsigned int size, unsigned char mem, ADDR_T *address);
 
 #endif /* REMOVE_BLOCK_SUPPORT */
 
-#ifdef __ICCAVR__
-#  define C_TASK __C_task
-#else /* ! __ICCAVR__ */
 #  define C_TASK /**/
-#endif /* __ICCAVR__ */
 
-void main(void)
-{
+
+/************************************************************************************************************************************/
+/**	@fcn		int main(void)
+ *  @brief		x
+ *  @details	x
+ */
+/************************************************************************************************************************************/
+int main(void) {
+	
+	//Locals
     ADDR_T address;
-    unsigned int temp_int;
+    volatile unsigned int temp_int;
     unsigned char val;
 
 	DDRD = (1<<PIND1);
     /* Initialization */    
-    void (*funcptr)( void ) = 0x0000; // Set up function pointer to RESET vector.
+    void (*funcptr)(void) = 0x0000;											// Set up function pointer to RESET vector.
     
-	/* The ATmega28PB Xplained Mini has external pull-up, no use of internal pull-up. Using SW0 on the Xplained Mini as PROGPIN. */
-	//PROGPORT |= (1<<PROG_NO); // Uncomment to enable pull-up on PROG_NO line on PROGPORT.
-	
-    initbootuart(); // Initialize UART.
+    initbootuart();															// Initialize UART.
 
     /* Branch to bootloader or application code? */
-    if( !(PROGPIN & (1<<PROG_NO)) ) // If PROGPIN is pulled low, enter programmingmode.
-    {
+    if( !(PROGPIN & (1<<PROG_NO)) ) {										// If PROGPIN is pulled low, enter programmingmode.
         /* Main loop */
 		//txtstr((uint8_t*)"Bootloader\n");
-        while(1)
-        {
-            val=recchar(); // Wait for command character.
+        for(;;) {
+            val=recchar();													// Wait for command character.
 
             // Check autoincrement status.
-            if(val=='a')
-            {
-                sendchar('Y'); // Yes, we do autoincrement.
+            if(val=='a') {
+                sendchar('Y');												// Yes, we do autoincrement.
             }
 
-
             // Set address.
-            else if(val=='A') // Set address...
-            { // NOTE: Flash addresses are given in words, not bytes.                                            
-                address=(recchar()<<8) | recchar(); // Read address high and low byte.
-                sendchar('\r'); // Send OK back.
+            else if(val=='A') {												// Set address... Flash addresses are given in words, not bytes.                                            
+                address=(recchar()<<8) | recchar();							// Read address high and low byte.
+                sendchar('\r');												// Send OK back.
             }
 
             
             // Chip erase.
-            else if(val=='e')
-            {
-                for(address = 0; address < APP_END;address += PAGESIZE)
-                { // NOTE: Here we use address as a byte-address, not word-address, for convenience.
+            else if(val=='e') {
+                for(address = 0; address < APP_END;address += PAGESIZE) { // NOTE: Here we use address as a byte-address, not word-address, for convenience.
                     _WAIT_FOR_SPM();        
-#ifdef __ICCAVR__
-#pragma diag_suppress=Pe1053 // Suppress warning for conversion from long-type address to flash ptr.
-#endif
                     _PAGE_ERASE( address );
-#ifdef __ICCAVR__
-#pragma diag_default=Pe1053 // Back to default.
-#endif
                 }
-          
-                sendchar('\r'); // Send OK back.
+                sendchar('\r');												// Send OK back.
             }
             
 #ifndef REMOVE_BLOCK_SUPPORT
             // Check block load support.
-            else if(val=='b')
-		    {
-    			sendchar('Y'); // Report block load supported.
-    			sendchar((BLOCKSIZE>>8) & 0xFF); // MSB first.
-    			sendchar(BLOCKSIZE&0xFF); // Report BLOCKSIZE (bytes).
+            else if(val=='b') {
+    			sendchar('Y');												// Report block load supported.
+    			sendchar((BLOCKSIZE>>8) & 0xFF);							// MSB first.
+    			sendchar(BLOCKSIZE&0xFF);									// Report BLOCKSIZE (bytes).
     		}
 
 
             // Start block load.
-    		else if(val=='B')
-    		{
-	    	    temp_int = (recchar()<<8) | recchar(); // Get block size.
-		    	val = recchar(); // Get memtype.
-			    sendchar( BlockLoad(temp_int,val,&address) ); // Block load.
+    		else if(val=='B') {
+	    	    temp_int = (recchar()<<8) | recchar();						// Get block size.
+		    	val = recchar();											// Get memtype.
+			    sendchar( BlockLoad(temp_int,val,&address) );				// Block load.
 		    }
 		
 		    
 		    // Start block read.
-    		else if(val=='g')
-    		{
-	    	    temp_int = (recchar()<<8) | recchar(); // Get block size.
-    			val = recchar(); // Get memtype
-	    		BlockRead(temp_int,val,&address); // Block read
+    		else if(val=='g') {
+	    	    temp_int = (recchar()<<8) | recchar();						// Get block size.
+    			val = recchar();											// Get memtype
+	    		BlockRead(temp_int,val,&address);							// Block read
     		}		
 #endif /* REMOVE_BLOCK_SUPPORT */
 
@@ -171,60 +155,36 @@ void main(void)
                 // Send high byte, then low byte of flash word.
                 _WAIT_FOR_SPM();        
                 _ENABLE_RWW_SECTION();
-#ifdef __ICCAVR__
-#pragma diag_suppress=Pe1053 // Suppress warning for conversion from long-type address to flash ptr.
-#endif
-                sendchar( _LOAD_PROGRAM_MEMORY( (address << 1)+1 ) );
-                sendchar( _LOAD_PROGRAM_MEMORY( (address << 1)+0 ) );
-#ifdef __ICCAVR__
-#pragma diag_default=Pe1053 // Back to default.
-#endif
-
+                sendchar(_LOAD_PROGRAM_MEMORY((address << 1)+1));
+                sendchar(_LOAD_PROGRAM_MEMORY((address << 1)+0));
                 address++; // Auto-advance to next Flash word.
             }
         
 
             // Write program memory, low byte.        
-            else if(val=='c')
-            { // NOTE: Always use this command before sending high byte.
-                temp_int=recchar(); // Get low byte for later _FILL_TEMP_WORD.
-                sendchar('\r'); // Send OK back.
+            else if(val=='c') {												// NOTE: Always use this command before sending high byte.
+                temp_int=recchar();											// Get low byte for later _FILL_TEMP_WORD.
+                sendchar('\r');												// Send OK back.
             }
             
             
             // Write program memory, high byte.
-            else if(val=='C')
-            {
+            else if(val=='C') {
                 temp_int |= (recchar()<<8); // Get and insert high byte.
                 _WAIT_FOR_SPM();
-#ifdef __ICCAVR__
-#pragma diag_suppress=Pe1053 // Suppress warning for conversion from long-type address to flash ptr.
-#endif
                 _FILL_TEMP_WORD( (address << 1), temp_int ); // Convert word-address to byte-address and fill.
-#ifdef __ICCAVR__
-#pragma diag_default=Pe1053 // Back to default.
-#endif
                 address++; // Auto-advance to next Flash word.
                 sendchar('\r'); // Send OK back.
             }
         
         
             // Write page.       
-            else if(val== 'm')
-            {
-                if( address >= (APP_END>>1) ) // Protect bootloader area.
-                {
+            else if(val== 'm') {
+                if(address >= (APP_END>>1)) {								// Protect bootloader area.
                     sendchar('?');
-                } else
-                {
+                } else {
                     _WAIT_FOR_SPM();        
-#ifdef __ICCAVR__
-#pragma diag_suppress=Pe1053 // Suppress warning for conversion from long-type address to flash ptr.
-#endif
                     _PAGE_WRITE( address << 1 ); // Convert word-address to byte-address and write.
-#ifdef __ICCAVR__
-#pragma diag_default=Pe1053 // Back to default.
-#endif
                 }
 
                 sendchar('\r'); // Send OK back.
@@ -233,8 +193,7 @@ void main(void)
 
 #ifndef REMOVE_EEPROM_BYTE_SUPPORT
             // Write EEPROM memory.
-            else if (val == 'D')
-            {
+            else if (val == 'D') {
                 _WAIT_FOR_SPM();        
                 EEARL = address; // Setup EEPROM address.
                 EEARH = (address >> 8);
@@ -250,8 +209,7 @@ void main(void)
 
             
             // Read EEPROM memory.
-            else if (val == 'd')
-            {
+            else if (val == 'd') {
                 EEARL = address; // Setup EEPROM address.
                 EEARH = (address >> 8);
                 EECR |= (1<<EERE); // Read byte...
@@ -262,8 +220,7 @@ void main(void)
 
 #ifndef REMOVE_FUSE_AND_LOCK_BIT_SUPPORT
             // Write lockbits.
-            else if(val=='l')
-            {
+            else if(val=='l') {
                 _WAIT_FOR_SPM();        
                 _SET_LOCK_BITS( recchar() ); // Read and set lock bits.
                 sendchar('\r'); // Send OK back.
@@ -272,32 +229,28 @@ void main(void)
 
 #if defined(_GET_LOCK_BITS)
             // Read lock bits.
-            else if(val=='r')
-            {
+            else if(val=='r') {
                 _WAIT_FOR_SPM();        
                 sendchar( _GET_LOCK_BITS() );
             }
 
 
             // Read fuse bits.
-            else if(val=='F')
-            {
+            else if(val=='F') {
                 _WAIT_FOR_SPM();        
                 sendchar( _GET_LOW_FUSES() );
             }
 
 
             // Read high fuse bits.
-            else if(val=='N')
-            {
+            else if(val=='N') {
                 _WAIT_FOR_SPM();        
                 sendchar( _GET_HIGH_FUSES() );
             }
 
 
             // Read extended fuse bits.
-            else if(val=='Q')
-            {
+            else if(val=='Q') {
                 _WAIT_FOR_SPM();        
                 sendchar( _GET_EXTENDED_FUSES() );
             }
@@ -306,205 +259,180 @@ void main(void)
 
 #ifndef REMOVE_AVRPROG_SUPPORT        
             // Enter and leave programming mode.
-            else if((val=='P')||(val=='L'))
-            {
-                sendchar('\r'); // Nothing special to do, just answer OK.
+            else if((val=='P')||(val=='L')) {
+                sendchar('\r');												// Nothing special to do, just answer OK.
             }
             
             
             // Exit bootloader.
-            else if(val=='E')
-            {
+            else if(val=='E') {
                 _WAIT_FOR_SPM();        
                 _ENABLE_RWW_SECTION();
                 sendchar('\r');
-                funcptr(); // Jump to Reset vector 0x0000 in Application Section.
+                funcptr();													// Jump to Reset vector 0x0000 in Application Section.
             }
 
     
             // Get programmer type.        
-            else if (val=='p')
-            {
-                sendchar('S'); // Answer 'SERIAL'.
+            else if (val=='p') {
+                sendchar('S');												// Answer 'SERIAL'.
             }
             
             
             // Return supported device codes.
-            else if(val=='t')
-            {
+            else if(val=='t') {
 #if PARTCODE+0 > 0
-                sendchar( PARTCODE ); // Supports only this device, of course.
+                sendchar( PARTCODE );										// Supports only this device, of course.
 #endif /* PARTCODE */
-                sendchar( 0 ); // Send list terminator.
+                sendchar(0);												// Send list terminator.
             }
             
             
             // Set LED, clear LED and set device type.
-            else if((val=='x')||(val=='y')||(val=='T'))
-            {
-                recchar(); // Ignore the command and it's parameter.
-                sendchar('\r'); // Send OK back.
+            else if((val=='x')||(val=='y')||(val=='T')) {
+                recchar();													// Ignore the command and it's parameter.
+                sendchar('\r');												// Send OK back.
             }
 #endif /* REMOVE_AVRPROG_SUPPORT */
        
             // Return programmer identifier.
-            else if(val=='S')
-            {
-                sendchar('A'); // Return 'AVRBOOT'.
-                sendchar('V'); // Software identifier (aka programmer signature) is always 7 characters.
+            else if(val=='S') {
+                sendchar('A');												// Return 'AVRBOOT'.
+                sendchar('V');												// Software identifier (aka programmer signature) is always 7 characters.
                 sendchar('R');
                 sendchar('B');
                 sendchar('O');
                 sendchar('O');
                 sendchar('T');
             }
-        
             
             // Return software version.
-            else if(val=='V')
-            {
+            else if(val=='V') {
                 sendchar('1');
                 sendchar('5');
             }        
 
-
             // Return signature bytes.
-            else if(val=='s')
-            {							
-                sendchar( SIGNATURE_BYTE_3 );
-                sendchar( SIGNATURE_BYTE_2 );
-                sendchar( SIGNATURE_BYTE_1 );
+            else if(val=='s') {	
+                sendchar(SIGNATURE_BYTE_3);
+                sendchar(SIGNATURE_BYTE_2);
+                sendchar(SIGNATURE_BYTE_1);
             }       
 
-
             // The last command to accept is ESC (synchronization).
-            else if(val!=0x1b)                  // If not ESC, then it is unrecognized...
-            {
+            else if(val!=0x1b) {											// If not ESC, then it is unrecognized...
                 sendchar('?');
             }
         } // end: for(;;)
     }
-    else
-    {
+    else {
         _WAIT_FOR_SPM();        
         _ENABLE_RWW_SECTION();
-        funcptr(); // Jump to Reset vector 0x0000 in Application Section.
+        funcptr();															// Jump to Reset vector 0x0000 in Application Section.
     }
+
+	return EXIT_SUCCESS;
 } // end: main
 
 
 #ifndef REMOVE_BLOCK_SUPPORT
-unsigned char BlockLoad(unsigned int size, unsigned char mem, ADDR_T *address)
-{
+/************************************************************************************************************************************/
+/**	@fcn		unsigned char BlockLoad(unsigned int size, unsigned char mem, ADDR_T *address)
+ *  @brief		x
+ *  @details	x
+ */
+/************************************************************************************************************************************/
+unsigned char BlockLoad(unsigned int size, unsigned char mem, ADDR_T *address) {
+
     unsigned char buffer[BLOCKSIZE];
     unsigned int data;
     ADDR_T tempaddress;
 	
     // EEPROM memory type.
-    if(mem=='E')
-    {
+    if(mem=='E') {
+
         /* Fill buffer first, as EEPROM is too slow to copy with UART speed */
         for(tempaddress=0;tempaddress<size;tempaddress++)
             buffer[tempaddress] = recchar();
         
         /* Then program the EEPROM */
         _WAIT_FOR_SPM();
-    	for( tempaddress=0; tempaddress < size; tempaddress++)
-    	{
-	        EEARL = *address; // Setup EEPROM address
+    	for( tempaddress=0; tempaddress < size; tempaddress++) {
+	        EEARL = *address;												// Setup EEPROM address
             EEARH = ((*address) >> 8);
-            EEDR = buffer[tempaddress]; // Get byte.
-            EECR |= (1<<EEMPE); // Write byte.
+            EEDR = buffer[tempaddress];										// Get byte.
+            EECR |= (1<<EEMPE);												// Write byte.
             EECR |= (1<<EEPE);
-            while (EECR & (1<<EEPE)) // Wait for write operation to finish.
+            while (EECR & (1<<EEPE))										// Wait for write operation to finish.
                 ;
 
-  			(*address)++; // Select next EEPROM byte
+  			(*address)++;													// Select next EEPROM byte
         }
 
-        return '\r'; // Report programming OK
+        return '\r';														// Report programming OK
     } 
     
     // Flash memory type.
-	else if(mem=='F')
-    { // NOTE: For flash programming, 'address' is given in words.
-        (*address) <<= 1; // Convert address to bytes temporarily.
-        tempaddress = (*address);  // Store address in page.
+	else if(mem=='F') {														// NOTE: For flash programming, 'address' is given in words.
+        (*address) <<= 1;													// Convert address to bytes temporarily.
+        tempaddress = (*address);											// Store address in page.
 	
-        do
-		{
+        do {
             data = recchar();
             data |= (recchar() << 8);
-#ifdef __ICCAVR__
-#pragma diag_suppress=Pe1053 // Suppress warning for conversion from long-type address to flash ptr.
-#endif
             _FILL_TEMP_WORD(*address,data);
-#ifdef __ICCAVR__
-#pragma diag_default=Pe1053 // Back to default.
-#endif
-            (*address)+=2; // Select next word in memory.
-            size -= 2; // Reduce number of bytes to write by two.
-        } while(size); // Loop until all bytes written.
+            (*address)+=2;													// Select next word in memory.
+            size -= 2;														// Reduce number of bytes to write by two.
+        } while(size);														// Loop until all bytes written.
 
-#ifdef __ICCAVR__
-#pragma diag_suppress=Pe1053 // Suppress warning for conversion from long-type address to flash ptr.
-#endif
 	_PAGE_WRITE(tempaddress);
-#ifdef __ICCAVR__
-#pragma diag_default=Pe1053 // Back to default.
-#endif
 	_WAIT_FOR_SPM();
 	_ENABLE_RWW_SECTION();
 
-        (*address) >>= 1; // Convert address back to Flash words again.
-        return '\r'; // Report programming OK
+        (*address) >>= 1;													// Convert address back to Flash words again.
+        return '\r';														// Report programming OK
     }
     
     // Invalid memory type?
-    else
-    {
+    else {
         return '?';
     }
 }
 
 
-void BlockRead(unsigned int size, unsigned char mem, ADDR_T *address)
-{
-    // EEPROM memory type.
-    if (mem=='E') // Read EEPROM
-    {
-        do
-        {
-            EEARL = *address; // Setup EEPROM address
-            EEARH = ((*address) >> 8);
-            (*address)++; // Select next EEPROM byte
-            EECR |= (1<<EERE); // Read EEPROM
-            sendchar(EEDR); // Transmit EEPROM dat ato PC
+/************************************************************************************************************************************/
+/**	@fcn		void BlockRead(unsigned int size, unsigned char mem, ADDR_T *address)
+ *  @brief		x
+ *  @details	x
+ */
+/************************************************************************************************************************************/
+void BlockRead(unsigned int size, unsigned char mem, ADDR_T *address) {
 
-            size--; // Decrease number of bytes to read
-        } while (size); // Repeat until all block has been read
+    // EEPROM memory type.
+    if (mem=='E') {															// Read EEPROM
+        do {
+            EEARL = *address;												// Setup EEPROM address
+            EEARH = ((*address) >> 8);
+            (*address)++;													// Select next EEPROM byte
+            EECR |= (1<<EERE);												// Read EEPROM
+            sendchar(EEDR);													// Transmit EEPROM dat ato PC
+
+            size--;															// Decrease number of bytes to read
+        } while (size);														// Repeat until all block has been read
     }
     
     // Flash memory type.
-	else if(mem=='F')
-	{
-        (*address) <<= 1; // Convert address to bytes temporarily.
+	else if(mem=='F') {
+        (*address) <<= 1;													// Convert address to bytes temporarily.
 	
-        do
-        {
-#ifdef __ICCAVR__
-#pragma diag_suppress=Pe1053 // Suppress warning for conversion from long-type address to flash ptr.
-#endif
+        do {
             sendchar( _LOAD_PROGRAM_MEMORY(*address) );
             sendchar( _LOAD_PROGRAM_MEMORY((*address)+1) );
-#ifdef __ICCAVR__
-#pragma diag_default=Pe1053 // Back to default.
-#endif
-            (*address) += 2; // Select next word in memory.
-            size -= 2; // Subtract two bytes from number of bytes to read
-        } while (size); // Repeat until all block has been read
+            (*address) += 2;												// Select next word in memory.
+            size -= 2;														// Subtract two bytes from number of bytes to read
+        } while (size);														// Repeat until all block has been read
 
-        (*address) >>= 1; // Convert address back to Flash words again.
+        (*address) >>= 1;													// Convert address back to Flash words again.
     }
 }
 #endif /* REMOVE_BLOCK_SUPPORT */

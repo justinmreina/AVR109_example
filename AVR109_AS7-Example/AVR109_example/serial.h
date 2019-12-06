@@ -1,22 +1,24 @@
-/*************************************************************************************************************************************
-*
-* Atmel Corporation
-*
-* File              : serial.h
-* Compiler          : IAR C 3.10C Kickstart, AVR-GCC/avr-libc(>= 1.2.5)
-* Revision          : $Revision: 1.7 $
-* Date              : $Date: Tuesday, June 07, 200 $
-* Updated by        : $Author: raapeland $
-*
-* Support mail      : avr@atmel.com
-*
-* Target platform   : All AVRs with bootloader support
-*
-* AppNote           : AVR109 - Self-programming
-*
-* Description       : Header file for serial.c
-*************************************************************************************************************************************/
+/************************************************************************************************************************************/
+/** @file		serial.h
+ * 	@brief		Header file for serial.c
+ * 	@details	x
+ *
+ * 	@notes		x
+ *
+ * 	@section	Opens
+ * 			none current
+ *
+ * 	@section	Legal Disclaimer
+ * 			All contents of this source file and/or any other related source files are the explicit property of Justin Reina.
+ * 			Do not distribute. Do not copy.
+ */
+/************************************************************************************************************************************/
+#ifndef _SERIAL_H
+#define _SERIAL_H
 
 void initbootuart( void );
 void sendchar( unsigned char );
 unsigned char recchar( void );
+
+#endif /* _SERIAL_H */
+

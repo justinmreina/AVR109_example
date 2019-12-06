@@ -30,15 +30,15 @@
     <EraseKey />
     <AsfFrameworkConfig>
       <framework-data>
-  <options />
-  <configurations />
-  <files />
-  <documentation help="" />
-  <offline-documentation help="" />
-  <dependencies>
-    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.39.0" />
-  </dependencies>
-</framework-data>
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.39.0" />
+        </dependencies>
+      </framework-data>
     </AsfFrameworkConfig>
     <avrtool>com.atmel.avrdbg.tool.medbg</avrtool>
     <avrtoolserialnumber>ATML2523030200002870</avrtoolserialnumber>
@@ -142,6 +142,9 @@
     <Compile Include="defines.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="doc\ref\stdcomments.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="flash.h">
       <SubType>compile</SubType>
     </Compile>
@@ -154,6 +157,10 @@
     <Compile Include="serial.h">
       <SubType>compile</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="doc\" />
+    <Folder Include="doc\ref\" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

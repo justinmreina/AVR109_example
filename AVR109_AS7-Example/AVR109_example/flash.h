@@ -1,21 +1,21 @@
-/*************************************************************************************************************************************
-*
-* Atmel Corporation
-*
-* File              : flash.h
-* Compiler          : IAR C 3.10C Kickstart, AVR-GCC/avr-libc(>= 1.2.5)
-* Revision          : $Revision: 1.7 $
-* Date              : $Date: Tuesday, June 07, 200 $
-* Updated by        : $Author: raapeland $
-*
-* Support mail      : avr@atmel.com
-*
-* Target platform   : All AVRs with bootloader support
-*
-* AppNote           : AVR109 - Self-programming
-*
-* Description       : Flash operations for AVR109 Self-programming
-*************************************************************************************************************************************/
+/************************************************************************************************************************************/
+/** @file		flash.h
+ * 	@brief		Flash operations for AVR109 Self-programming
+ * 	@details	x
+ *
+ * 	@notes		x
+ *
+ * 	@section	Opens
+ * 			is this needed for Atmel Studio?
+ *
+ * 	@section	Legal Disclaimer
+ * 			All contents of this source file and/or any other related source files are the explicit property of Justin Reina.
+ * 			Do not distribute. Do not copy.
+ */
+/************************************************************************************************************************************/
+#ifndef _FLASH_H
+#define _FLASH_H
+
 
 #if defined(__ICCAVR__)
 
@@ -72,3 +72,6 @@
 #else
 #  error "Don't know your compiler."
 #endif
+
+#endif /* _FLASH_H */
+

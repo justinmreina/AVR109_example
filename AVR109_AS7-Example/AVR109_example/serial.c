@@ -1,41 +1,64 @@
-/*************************************************************************************************************************************
-*
-* Atmel Corporation
-*
-* File              : serial.c
-* Compiler          : IAR C 3.10C Kickstart, AVR-GCC/avr-libc(>= 1.2.5)
-* Revision          : $Revision: 1.7 $
-* Date              : $Date: Tuesday, June 07, 200 $
-* Updated by        : $Author: raapeland $
-*
-* Support mail      : avr@atmel.com
-*
-* Target platform   : All AVRs with bootloader support
-*
-* AppNote           : AVR109 - Self-programming
-*
-* Description       : UART communication routines
-*************************************************************************************************************************************/
+/************************************************************************************************************************************/
+/** @file		serial.c
+ * 	@brief		UART communication routines
+ * 	@details	x
+ *
+ * 	@notes		x
+ *
+ * 	@section	Opens
+ * 			none current
+ *
+ * 	@section	Legal Disclaimer
+ * 			All contents of this source file and/or any other related source files are the explicit property of Justin Reina.
+ * 			Do not distribute. Do not copy.
+ */
+/************************************************************************************************************************************/
 #include "defines.h"
 
 
-void initbootuart(void)
-{
+/************************************************************************************************************************************/
+/**	@fcn		void initbootuart(void)
+ *  @brief		x
+ *  @details	x
+ */
+/************************************************************************************************************************************/
+void initbootuart(void) {
+
 	BAUD_RATE_LOW_REG = BRREG_VALUE;
 	UART_CONTROL_REG = (1 << ENABLE_RECEIVER_BIT) | (1 << ENABLE_TRANSMITTER_BIT); // enable receive and transmit 	
+
+	return;
 }
 
 
-void sendchar(unsigned char c)
-{
-  UART_DATA_REG = c;                                   // prepare transmission
-  while (!(UART_STATUS_REG & (1 << TRANSMIT_COMPLETE_BIT)));// wait until byte sendt
-  UART_STATUS_REG |= (1 << TRANSMIT_COMPLETE_BIT);          // delete TXCflag
+/************************************************************************************************************************************/
+/**	@fcn		void sendchar(unsigned char c)
+ *  @brief		x
+ *  @details	x
+ */
+/************************************************************************************************************************************/
+void sendchar(unsigned char c) {
+
+  UART_DATA_REG = c;														/* prepare transmission									*/
+  while (!(UART_STATUS_REG & (1 << TRANSMIT_COMPLETE_BIT)));				/* wait until byte sent									*/
+  UART_STATUS_REG |= (1 << TRANSMIT_COMPLETE_BIT);							/* delete TXCflag										*/
+
+  return;
 }
 
 
-unsigned char recchar(void)
-{
-  while(!(UART_STATUS_REG & (1 << RECEIVE_COMPLETE_BIT)));  // wait for data
-  return UART_DATA_REG;
+/************************************************************************************************************************************/
+/**	@fcn		unsigned char recchar(void)
+ *  @brief		x
+ *  @details	x
+ */
+/************************************************************************************************************************************/
+unsigned char recchar(void) {
+
+	//Wait for data
+	while(!(UART_STATUS_REG & (1 << RECEIVE_COMPLETE_BIT))) {
+	};
+  
+	return UART_DATA_REG;
 }
+
